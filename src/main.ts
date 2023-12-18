@@ -1,12 +1,14 @@
 import { Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { LastCommandsModal, onCommandTrigger } from './last-command';
+import { LastCommandsModal, getCommandName, onCommandTrigger } from './last-command';
 
 interface RLCSettings {
-	maxLastCmds: number
+	maxLastCmds: number;
+	notify: boolean
 }
 
 const DEFAULT_SETTINGS: RLCSettings = {
-	maxLastCmds: 4
+	maxLastCmds: 4,
+	notify: true
 }
 
 export default class RepeatLastCommands extends Plugin {
@@ -25,7 +27,12 @@ export default class RepeatLastCommands extends Plugin {
 			id: "repeat-command",
 			name: "Repeat last command",
 			callback: async () => {
-				if (this.lastCommand) (this.app as any).commands.executeCommandById(this.lastCommand)
+				if (this.lastCommand) {
+					if (this.settings.notify) {
+						new Notice(`Repeated: ${getCommandName(this.lastCommand)}`)
+					};
+					(this.app as any).commands.executeCommandById(this.lastCommand)
+				}
 				else new Notice("No last command")
 			},
 		});
@@ -59,8 +66,7 @@ class RLCSettingTab extends PluginSettingTab {
 		const { containerEl: El } = this;
 		El.empty();
 		El.createEl("h2", { text: "Repeat Last Commands" });
-		const setting = new Setting(El)
-		setting
+		new Setting(El)
 			.addSlider((slider) => {
 				slider
 					.setLimits(2, 12, 1)
@@ -70,6 +76,16 @@ class RLCSettingTab extends PluginSettingTab {
 						this.plugin.settings.maxLastCmds = value;
 						await this.plugin.saveSettings();
 					});
+			})
+		new Setting(El)
+			.setDesc("notify me when doing Repeat Last Command")
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.notify)
+					.onChange(async(value) => {
+						this.plugin.settings.notify = value
+						await this.plugin.saveSettings();
+					})
 			})
 	}
 }

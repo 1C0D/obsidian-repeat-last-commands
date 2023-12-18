@@ -120,7 +120,7 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
     }
 }
 
-function getCommandName(id: string) {
+export function getCommandName(id: string) {
     for (const key in this.app.commands.commands) {
         const command = this.app.commands.commands[key];
         if (command.id === id) {
