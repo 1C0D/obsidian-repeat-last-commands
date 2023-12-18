@@ -67,18 +67,18 @@ class RLCSettingTab extends PluginSettingTab {
 		El.empty();
 		El.createEl("h2", { text: "Repeat Last Commands" });
 		new Setting(El)
+			.setName("repeat last commands: number max of commands to show")
 			.addSlider((slider) => {
 				slider
 					.setLimits(2, 12, 1)
 					.setValue(this.plugin.settings.maxLastCmds)
-					.setDynamicTooltip()
 					.onChange(async (value) => {
 						this.plugin.settings.maxLastCmds = value;
 						await this.plugin.saveSettings();
 					});
 			})
 		new Setting(El)
-			.setDesc("notify me when doing Repeat Last Command")
+		.setName("repeat last command: notify last command")
 			.addToggle((toggle) => {
 				toggle
 					.setValue(this.plugin.settings.notify)
