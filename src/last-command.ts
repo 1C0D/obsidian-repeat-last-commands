@@ -32,7 +32,6 @@ export function onCommandTrigger(plugin: Tools) {//notice we must pass plugin to
     const uninstallCommand = around(this.app.commands, {
         executeCommand(originalMethod) {
             return function (...args: Command[]) {
-                console.log("args[0]", args[0].id)
                 if (args[0].id === "command-palette:open") { addCPListeners(plugin) }
                 else { onHKTrigger(plugin, args[0].id) }
                 const result =
