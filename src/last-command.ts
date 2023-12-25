@@ -46,7 +46,8 @@ export function onCommandTrigger(plugin: Tools) {//notice we must pass plugin to
 function getRejectedCondition(id: string) {
     return (
         id === "repeat-last-commands:repeat-command" ||
-        id === "repeat-last-commands:repeat-commands"
+        id === "repeat-last-commands:repeat-commands" ||
+        id === "repeat-last-commands:get-last-command-id"
     )
 }
 
@@ -113,6 +114,7 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
 
     renderSuggestion(cmd: LastCommand, el: HTMLElement) {
         el.createEl("div", { text: `${cmd[1]}` });
+        el.createEl("small", { text: `${cmd[0]}` });
     }
 
     onChooseSuggestion(cmd: LastCommand, evt: MouseEvent | KeyboardEvent) {

@@ -5,6 +5,8 @@ setting: notify what command was
 
 - repeat last commands (suggestion: Ctrl Alt P)  
 setting: max of commands to show in settings
-![cmds](./ressources/commands.png)
+![cmds](./ressources/added_id.png)
 
 - toggle pinned commands pressing TAB
+
+- for devs, you can run "copy last command id in clipboard". id is appearing in repeat last commands too.

@@ -1,7 +1,7 @@
 {
 	"name": "repeat-last-commands",
-	"version": "1.1.0",
-	"description": "Repeat last command or commands. toggle pinned command with tab",
+	"version": "1.2.0",
+	"description": "Repeat last command or commands. toggle pinned command with tab. get last command id",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",

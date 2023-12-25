@@ -45,6 +45,18 @@ export default class RepeatLastCommands extends Plugin {
 				else new Notice("No last command")
 			},
 		});
+
+		this.addCommand({
+			id: "get-last-command-id",
+			name: "Copy last command id in clipbooard",
+			callback: async () => {
+				if (this.lastCommand) {
+					navigator.clipboard.writeText(this.lastCommand).then(text => {
+						new Notice("Command id copied in clipboard")
+					}).catch(err => { console.error(err) });
+				} else new Notice("No last command")
+			},
+		});
 	}
 
 	async loadSettings() {
@@ -78,11 +90,11 @@ class RLCSettingTab extends PluginSettingTab {
 					});
 			})
 		new Setting(El)
-		.setName("repeat last command: notify last command")
+			.setName("repeat last command: notify last command")
 			.addToggle((toggle) => {
 				toggle
 					.setValue(this.plugin.settings.notify)
-					.onChange(async(value) => {
+					.onChange(async (value) => {
 						this.plugin.settings.notify = value
 						await this.plugin.saveSettings();
 					})
