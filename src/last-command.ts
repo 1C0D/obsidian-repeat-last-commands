@@ -3,7 +3,7 @@ import Tools from "./main";
 import { Command, SuggestModal } from "obsidian";
 
 function addCPListeners(plugin: Tools) {//command palette
-    const modal = (plugin.app as any).internalPlugins.getPluginById("command-palette").instance.modal
+    const modal = plugin.app.internalPlugins.getPluginById("command-palette").instance.modal
     const resultContainerEl = modal.resultContainerEl
 
     resultContainerEl.addEventListener("click", (e: MouseEvent) => registerCPCmd(e, plugin));
@@ -12,8 +12,8 @@ function addCPListeners(plugin: Tools) {//command palette
     document.addEventListener("keyup", keyupEventListener)
 
     // to erase the document.listener
-    const closeModal = (plugin.app as any).internalPlugins.getPluginById("command-palette").instance.modal.onClose;
-    (plugin.app as any).internalPlugins.getPluginById("command-palette").instance.modal.onClose = () => {
+    const closeModal = plugin.app.internalPlugins.getPluginById("command-palette").instance.modal.onClose;
+    plugin.app.internalPlugins.getPluginById("command-palette").instance.modal.onClose = () => {
         setTimeout(() => {
             document.removeEventListener("keyup", keyupEventListener)
         }, 400);// without timer enter is not working when selecting an item before
@@ -65,7 +65,7 @@ function applySelectedId(id: string, plugin: Tools) {
 }
 
 function getModalCmdVars(plugin: Tools) {
-    const pluginCommand = (plugin.app as any).internalPlugins.getPluginById("command-palette")
+    const pluginCommand = plugin.app.internalPlugins.getPluginById("command-palette")
     const instance = pluginCommand.instance
     const modal = instance.modal
     return { modal, instance, pluginCommand }
@@ -118,7 +118,7 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
     }
 
     onChooseSuggestion(cmd: LastCommand, evt: MouseEvent | KeyboardEvent) {
-        (this.plugin.app as any).commands.executeCommandById(`${cmd[0]}`)
+        this.plugin.app.commands.executeCommandById(`${cmd[0]}`)
     }
 }
 
