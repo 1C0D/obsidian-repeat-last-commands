@@ -77,7 +77,7 @@ class RLCSettingTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl: El } = this;
 		El.empty();
-		El.createEl("h2", { text: "Repeat Last Commands" });
+
 		new Setting(El)
 			.setName("repeat last commands: number max of commands to show")
 			.addSlider((slider) => {
