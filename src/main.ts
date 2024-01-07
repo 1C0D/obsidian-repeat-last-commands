@@ -24,7 +24,7 @@ export default class RepeatLastCommands extends Plugin {
 		this.register(onCommandTrigger(this))
 
 		this.addCommand({
-			id: "repeatcommand",
+			id: "repeat-command",
 			name: "Repeat last command",
 			callback: async () => {
 				if (this.lastCommand) {
@@ -38,8 +38,8 @@ export default class RepeatLastCommands extends Plugin {
 		});
 
 		this.addCommand({
-			id: "repeatcommands",
-			name: "Repeat last commands",
+			id: "repeat-commands",
+			name: "Repeat commands",
 			callback: async () => {
 				if (this.lastCommands.length) new LastCommandsModal(this).open()
 				else new Notice("No last command")
@@ -47,7 +47,7 @@ export default class RepeatLastCommands extends Plugin {
 		});
 
 		this.addCommand({
-			id: "get-lastcommand-id",
+			id: "get-last-command",
 			name: "Copy last command id in clipbooard",
 			callback: async () => {
 				if (this.lastCommand) {

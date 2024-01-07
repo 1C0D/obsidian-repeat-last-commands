@@ -47,7 +47,7 @@ function getRejectedCondition(id: string) {
     return (
         id === "repeat-last-commands:repeat-command" ||
         id === "repeat-last-commands:repeat-commands" ||
-        id === "repeat-last-commands:get-last-command-id"
+        id === "repeat-last-commands:get-last-command"
     )
 }
 
