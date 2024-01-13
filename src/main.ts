@@ -1,13 +1,8 @@
-import { Command, Notice, Plugin } from 'obsidian';
-import { LastCommandsModal } from './modals';
-import { addCPListeners } from './palette-cmds';
+import { Notice, Plugin } from 'obsidian';
+import { LastCommandsModal, getCommandName, onCommandTrigger } from './last-command';
 import { RLCSettingTab } from './settings';
-import { around } from 'monkey-around';
-import { onHKTrigger } from './hotkey-cmd';
-import { getCommandName } from './utils';
-import { RLCSettings } from './types/global';
-import { DEFAULT_SETTINGS } from './types/variables';
-
+import { RLCSettings } from './global';
+import { DEFAULT_SETTINGS } from './variables';
 
 export default class RepeatLastCommands extends Plugin {
 	settings: RLCSettings;
@@ -17,6 +12,7 @@ export default class RepeatLastCommands extends Plugin {
 	async onload() {
 		await this.loadSettings();
 		this.addSettingTab(new RLCSettingTab(this));
+
 
 		this.register(onCommandTrigger(this))
 
@@ -64,23 +60,4 @@ export default class RepeatLastCommands extends Plugin {
 		await this.saveData(this.settings);
 	}
 }
-
-// Monkey around executeCommand
-export function onCommandTrigger(plugin: RepeatLastCommands) {
-	const uninstallCommand = around(this.app.commands, {
-		executeCommand(originalMethod) {
-			return async function (...args: Command[]) {
-				// command palette commands
-				if (args[0].id === "command-palette:open") { await addCPListeners(plugin) }
-				// hotkey commands
-				else { onHKTrigger(plugin, args[0].id) }
-				const result =
-					originalMethod && originalMethod.apply(this, args);
-				return result;
-			};
-		},
-	});
-	return uninstallCommand;
-}
-
 
