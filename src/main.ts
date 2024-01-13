@@ -1,15 +1,13 @@
-import { Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { LastCommandsModal, getCommandName, onCommandTrigger } from './last-command';
+import { Command, Notice, Plugin } from 'obsidian';
+import { LastCommandsModal } from './modals';
+import { addCPListeners } from './palette-cmds';
+import { RLCSettingTab } from './settings';
+import { around } from 'monkey-around';
+import { onHKTrigger } from './hotkey-cmd';
+import { getCommandName } from './utils';
+import { RLCSettings } from './types/global';
+import { DEFAULT_SETTINGS } from './types/variables';
 
-interface RLCSettings {
-	maxLastCmds: number;
-	notify: boolean
-}
-
-const DEFAULT_SETTINGS: RLCSettings = {
-	maxLastCmds: 4,
-	notify: true
-}
 
 export default class RepeatLastCommands extends Plugin {
 	settings: RLCSettings;
@@ -19,7 +17,6 @@ export default class RepeatLastCommands extends Plugin {
 	async onload() {
 		await this.loadSettings();
 		this.addSettingTab(new RLCSettingTab(this));
-
 
 		this.register(onCommandTrigger(this))
 
@@ -68,36 +65,22 @@ export default class RepeatLastCommands extends Plugin {
 	}
 }
 
-class RLCSettingTab extends PluginSettingTab {
-	constructor(public plugin: RepeatLastCommands) {
-		super(plugin.app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const { containerEl: El } = this;
-		El.empty();
-
-		new Setting(El)
-			.setName("repeat last commands: number max of commands to show")
-			.addSlider((slider) => {
-				slider
-					.setLimits(2, 12, 1)
-					.setValue(this.plugin.settings.maxLastCmds)
-					.onChange(async (value) => {
-						this.plugin.settings.maxLastCmds = value;
-						await this.plugin.saveSettings();
-					});
-			})
-		new Setting(El)
-			.setName("repeat last command: notify last command")
-			.addToggle((toggle) => {
-				toggle
-					.setValue(this.plugin.settings.notify)
-					.onChange(async (value) => {
-						this.plugin.settings.notify = value
-						await this.plugin.saveSettings();
-					})
-			})
-	}
+// Monkey around executeCommand
+export function onCommandTrigger(plugin: RepeatLastCommands) {
+	const uninstallCommand = around(this.app.commands, {
+		executeCommand(originalMethod) {
+			return async function (...args: Command[]) {
+				// command palette commands
+				if (args[0].id === "command-palette:open") { await addCPListeners(plugin) }
+				// hotkey commands
+				else { onHKTrigger(plugin, args[0].id) }
+				const result =
+					originalMethod && originalMethod.apply(this, args);
+				return result;
+			};
+		},
+	});
+	return uninstallCommand;
 }
+
+

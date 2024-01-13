@@ -1,5 +1,12 @@
 import 'obsidian'
 
+interface RLCSettings {
+	maxLastCmds: number;
+	notify: boolean;
+    aliases: Record<string, Record<string,string>>
+	sortByLastCmd: boolean
+}
+
 
 declare module 'obsidian' {
     interface App {
