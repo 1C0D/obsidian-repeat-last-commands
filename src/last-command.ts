@@ -75,9 +75,6 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
     // suggestion values matching aliases
     if (Object.keys(aliases).length || settings.sort) {
         setTimeout(async () => {
-            if (Object.keys(aliases).length) {
-                aliasify(values, aliases)
-            }
             if (settings.sort && plugin.lastCommands.length && values) {
                 // starify
                 for (const value of values) {
@@ -91,20 +88,14 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
                         }
                     }
                 }
-                //
-                // for (const id of plugin.lastCommands) {
-                //     const value = values.find((value: any) => value.item.id === id)
-                //     if (value) {
-                //         value.item.name.startsWith("*") ? null :
-                //             value.item.name = "*" + value.item.name
-                //     }
-                //     values.push({ item: { id, name: id } })
-                // }
             }
-            instance.saveSettings(pluginCommand)
-
+            if (Object.keys(aliases).length) {
+                aliasify(values, aliases)
+            }
+            
             await modal.updateSuggestions()
-        }, 200);
+            instance.saveSettings(pluginCommand)
+        }, 400);
     }
 
     if (e instanceof KeyboardEvent && e.key !== "Enter" && e.key !== "Tab" && e.key !== "Alt") return

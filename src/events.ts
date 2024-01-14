@@ -23,6 +23,7 @@ async function addAlias(plugin: RepeatLastCommands, result: string, selectedItem
         }
         else {
             text = `${commandName.replace(`{${existingValue}}`, `{${value}}`)}`.trim();
+            if(!plugin.wasStared) text = text.substring(1)
             aliases[selectedId] = { name: text }
         }
     }
@@ -32,11 +33,13 @@ async function addAlias(plugin: RepeatLastCommands, result: string, selectedItem
         if (parts.length > 1) {
             // Console.log("has : & no {")
             text = `${parts[0]}: {${value}} ${parts[1]}`.trim()
+            if (!plugin.wasStared) text = text.substring(1)
             aliases[selectedId] = { name: text }
         } else {
             // Console.log("no : & no {")
             const prefix = value ? `{${value}}` : ""
             text = `${commandName} ${prefix}`.trim()
+            if (!plugin.wasStared) text = text.substring(1)
             value ? aliases[selectedId] = { name: text }
                 : delete aliases[selectedId];
         }
@@ -45,8 +48,8 @@ async function addAlias(plugin: RepeatLastCommands, result: string, selectedItem
 
     const { modal, instance, cmdPalette } = getModalCmdVars(plugin)
     if (!plugin.wasStared) {
-        const name = chooser.values[selectedItem].item.name
-        chooser.values[selectedItem].item.name = name.substring(1)
+        // const name = chooser.values[selectedItem].item.name
+        // chooser.values[selectedItem].item.name = name.substring(1)
         plugin.lastCommands.remove(selectedId)
         plugin.lastCommand = null
     }
