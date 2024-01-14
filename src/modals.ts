@@ -31,7 +31,7 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
 
 export class aliasModal extends Modal {
     result: string;
-    constructor(app: App, public plugin: RepeatLastCommands, 
+    constructor(app: App, public plugin: RepeatLastCommands,
         public selectedItem: number, public onSubmit: (result: string) => void, public width?: number) {
         super(app);
         if (this.width) {
@@ -43,18 +43,18 @@ export class aliasModal extends Modal {
         const { contentEl } = this;
         contentEl.empty();
         const { chooser } = getConditions(this.plugin)
-        const name = chooser.values[this.selectedItem].item.name
+        let name = chooser.values[this.selectedItem].item.name
+        name = name.startsWith("*") ? name.substring(1) : name
         this.titleEl.setText(`Define an alias`); //
         contentEl.setText(`for: "${name}"`); //
         const input = new TextComponent(contentEl)
-            .setPlaceholder('alias or nothing to delete previous alias')            
+            .setPlaceholder('alias or nothing to delete previous alias')
             .onChange(async (value) => {
                 this.result = value;
             })
-            const eL = input.inputEl
-            eL.addClass('alias-input')
-            eL.size = 35
-            
+        const eL = input.inputEl
+        eL.addClass('alias-input')
+        eL.size = 35
 
         new Setting(contentEl)
             .addButton((btn) =>

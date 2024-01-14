@@ -46,3 +46,17 @@ export function aliasify(values: any, aliases: any) {
         }
     })
 }
+
+export function getBackSelection(chooser: any, selectedItem: number) {
+    for (let i = 1; i <= selectedItem; i++) {
+    try {
+        if (selectedItem)
+                chooser.moveDown(1)
+        } catch (err) {
+            const dd = "I don't care this error, job is done"
+        }
+    }
+
+    // if (selectedItem === 0) chooser.selectedItem = chooser.values.length - 1
+    // else chooser.selectedItem = selectedItem - 1
+}

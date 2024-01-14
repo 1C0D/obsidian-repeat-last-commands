@@ -5,7 +5,7 @@ import { around } from "monkey-around";
 import { Command } from "obsidian";
 import RepeatLastCommands from "./main";
 import { altEvent } from "./events";
-import { aliasify, getConditions } from "./cmd-utils";
+import { aliasify, getBackSelection, getConditions } from "./cmd-utils";
 import { Console } from "./Console";
 
 function addCPListeners(plugin: RepeatLastCommands) {//command palette
@@ -46,8 +46,6 @@ function getRejectedCondition(plugin: RepeatLastCommands, id: string) {
     )
 }
 
-
-
 function applySelectedId(id: string, plugin: RepeatLastCommands) {
     // command
     const { lastCommands, settings } = plugin
@@ -66,11 +64,12 @@ function applySelectedId(id: string, plugin: RepeatLastCommands) {
 
 export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastCommands) {
     const { modal, instance, pluginCommand } = getModalCmdVars(plugin)
+    console.log("modal", modal)
     const { values, aliases, chooser } = getConditions(plugin)
     const settings = plugin.settings
     // Console.log("aliases", aliases)
     const selectedItem = chooser.selectedItem
-    Console.log("selectedItem", selectedItem)
+    // Console.log("selectedItem", selectedItem)
 
     // suggestion values matching aliases
     if (Object.keys(aliases).length || settings.sort) {
@@ -97,6 +96,7 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
                 }
             }
             instance.saveSettings(pluginCommand)
+            
             await modal.updateSuggestions()
         }, 200);
     }
@@ -105,7 +105,7 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
 
 
     if (e instanceof KeyboardEvent && e.key === "Alt") {
-        altEvent(e as KeyboardEvent, plugin, selectedItem)
+        altEvent(e as KeyboardEvent, plugin, selectedItem, chooser)
     }
 
     const selectedId = chooser.values[selectedItem]?.item.id
@@ -118,7 +118,9 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
             instance.options.pinned.push(selectedId)
         }
         instance.saveSettings(pluginCommand)
-        modal.updateSuggestions()
+        setTimeout(() => {
+            getBackSelection(chooser, selectedItem)            
+        }, 300);
         return
     }
 

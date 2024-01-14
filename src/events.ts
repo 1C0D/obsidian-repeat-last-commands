@@ -1,5 +1,5 @@
 import { Console } from "./Console"
-import {  getConditions, getModalCmdVars } from "./cmd-utils"
+import {  getBackSelection, getConditions, getModalCmdVars } from "./cmd-utils"
 import RepeatLastCommands from "./main"
 import { aliasModal } from "./modals"
 
@@ -22,7 +22,7 @@ async function addAlias(plugin: RepeatLastCommands, result: string, selectedItem
             delete aliases[selectedId];
         }
         else {
-            text = `${commandName.replace(`{${existingValue}}`, `{${value}}`)}`;
+            text = `${commandName.replace(`{${existingValue}}`, `{${value}}`)}`.trim();
             aliases[selectedId] = { name: text }
         }
     }
@@ -31,7 +31,7 @@ async function addAlias(plugin: RepeatLastCommands, result: string, selectedItem
         const parts = commandName.split(": ")
         if (parts.length > 1) {
             // Console.log("has : & no {")
-            text = `${parts[0]}: {${value}} ${parts[1]}`
+            text = `${parts[0]}: {${value}} ${parts[1]}`.trim()
             aliases[selectedId] = { name: text }
         } else {
             // Console.log("no : & no {")
@@ -46,12 +46,15 @@ async function addAlias(plugin: RepeatLastCommands, result: string, selectedItem
     const { modal, instance, cmdPalette } = getModalCmdVars(plugin)
     // commands[selectedId].name = text;
     await plugin.saveSettings();
-    await instance.saveSettings(cmdPalette) // save so the rendering is up to date
+    await instance.saveSettings(cmdPalette) // save so the rendering is up to date    
     await modal.updateSuggestions()
 }
 
 
-export function altEvent(e: KeyboardEvent, plugin: RepeatLastCommands, selectedItem: number) {
+export function altEvent(e: KeyboardEvent, plugin: RepeatLastCommands, selectedItem: number, chooser: any) {
 
-    new aliasModal(plugin.app, plugin, selectedItem, async(result) => await addAlias(plugin, result, selectedItem), 400).open()
+    new aliasModal(plugin.app, plugin, selectedItem, async(result) => {
+        await addAlias(plugin, result, selectedItem)
+        getBackSelection(chooser, selectedItem)
+    }, 300).open()
 }
