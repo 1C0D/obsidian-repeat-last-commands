@@ -1,8 +1,9 @@
 import { Notice, Plugin } from 'obsidian';
-import { LastCommandsModal, getCommandName, onCommandTrigger } from './last-command';
+import { getCommandName, onCommandTrigger } from './last-command';
 import { RLCSettingTab } from './settings';
 import { RLCSettings } from './global';
 import { DEFAULT_SETTINGS } from './variables';
+import { LastCommandsModal } from './modals';
 
 export default class RepeatLastCommands extends Plugin {
 	settings: RLCSettings;

@@ -2,8 +2,12 @@ import 'obsidian'
 
 interface RLCSettings {
     maxLastCmds: number;
-    notify: boolean
+    notify: boolean;
+    aliases: Record<string, Record<string, string>>
 }
+
+type LastCommand = [string, string][]
+
 
 declare module 'obsidian' {
     interface App {

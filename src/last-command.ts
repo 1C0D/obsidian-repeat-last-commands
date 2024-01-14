@@ -1,24 +1,13 @@
 import { around } from "monkey-around";
-import { Command, SuggestModal } from "obsidian";
+import { Command } from "obsidian";
 import RepeatLastCommands from "./main";
+import { altEvent } from "./events";
+import { aliasify, getConditions } from "./cmd-utils";
+import { Console } from "./Console";
 
 function addCPListeners(plugin: RepeatLastCommands) {//command palette
-    const modal = plugin.app.internalPlugins.getPluginById("command-palette").instance.modal
-    const resultContainerEl = modal.resultContainerEl
-
-    resultContainerEl.addEventListener("click", (e: MouseEvent) => registerCPCmd(e, plugin));
-
-    const keyupEventListener = (e: KeyboardEvent) => registerCPCmd(e, plugin);
-    document.addEventListener("keyup", keyupEventListener)
-
-    // to erase the document.listener
-    const closeModal = plugin.app.internalPlugins.getPluginById("command-palette").instance.modal.onClose;
-    plugin.app.internalPlugins.getPluginById("command-palette").instance.modal.onClose = () => {
-        setTimeout(() => {
-            document.removeEventListener("keyup", keyupEventListener)
-        }, 400);// without timer enter is not working when selecting an item before
-        closeModal.apply(modal);
-    };
+    addClickListener(plugin)
+    addKeyboardListener(plugin)
 }
 
 function onHKTrigger(plugin: RepeatLastCommands, id: string) {// after shortcut
@@ -64,22 +53,37 @@ function applySelectedId(id: string, plugin: RepeatLastCommands) {
     plugin.saveSettings()
 }
 
-function getModalCmdVars(plugin: RepeatLastCommands) {
-    const pluginCommand = plugin.app.internalPlugins.getPluginById("command-palette")
-    const instance = pluginCommand.instance
-    const modal = instance.modal
-    return { modal, instance, pluginCommand }
-}
 
 export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastCommands) {
     const { modal, instance, pluginCommand } = getModalCmdVars(plugin)
-
-    if (e instanceof KeyboardEvent && e.key !== "Enter" && e.key !== "Tab") return
-    const chooser = modal.chooser
+    const { values, aliases, chooser } = getConditions(plugin)
+    // Console.log("aliases", aliases)
     const selectedItem = chooser.selectedItem
-    const selectedId = chooser.values[selectedItem]?.item.id
-    const rejectedIds = getRejectedCondition(selectedId)
+    Console.log("selectedItem", selectedItem)
 
+    // suggestion values matching aliases
+    if (Object.keys(aliases).length)
+        // || lastCommands.length
+         {
+        setTimeout(async () => {
+            if (Object.keys(aliases).length) {
+                aliasify(values, aliases)
+            }
+            // if (lastCommands.length) {
+            //     values = sortValues(plugin, values, aliases)
+            // }
+            await modal.updateSuggestions()
+        }, 0);
+    }
+
+    if (e instanceof KeyboardEvent && e.key !== "Enter" && e.key !== "Tab" && e.key !== "Alt") return
+    
+
+    if (e instanceof KeyboardEvent && e.key === "Alt") {
+        altEvent(e as KeyboardEvent, plugin, selectedItem)
+    }
+
+    const selectedId = chooser.values[selectedItem]?.item.id    
     if (e instanceof KeyboardEvent && e.key === "Tab") {
         if (!modal.win) return
         const pinned = instance.options.pinned
@@ -92,34 +96,40 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
         modal.updateSuggestions()
         return
     }
-
+    
+    const rejectedIds = getRejectedCondition(selectedId)
     if (rejectedIds) return
     applySelectedId(selectedId, plugin)
 }
 
-type LastCommand = [string, string][]
 
-export class LastCommandsModal extends SuggestModal<LastCommand> {
-    constructor(public plugin: RepeatLastCommands) {
-        super(plugin.app);
-        this.plugin = plugin;
-    }
+// listeners
+function addClickListener(plugin: RepeatLastCommands) {
+    const { modal } = getModalCmdVars(plugin)
+    const resultContainerEl = modal.resultContainerEl
+    resultContainerEl.addEventListener("click", (e: MouseEvent) => registerCPCmd(e, plugin));
+}
 
-    getSuggestions(query: string): LastCommand[] {
-        const lastCommandsArr = this.plugin.lastCommands.map(id => [id, getCommandName(id)]).reverse();
-        return lastCommandsArr.filter(cmd =>
-            cmd[1].toLowerCase().includes(query.toLowerCase())
-        );
-    }
+function addKeyboardListener(plugin: RepeatLastCommands) {
+    const { modal } = getModalCmdVars(plugin)
+    const keyupEventListener = (e: KeyboardEvent) => registerCPCmd(e, plugin);
+    document.addEventListener("keyup", keyupEventListener)
 
-    renderSuggestion(cmd: LastCommand, el: HTMLElement) {
-        el.createEl("div", { text: `${cmd[1]}` });
-        el.createEl("small", { text: `${cmd[0]}` });
-    }
+    // to erase the document.listener
+    const closeModal = plugin.app.internalPlugins.getPluginById("command-palette").instance.modal.onClose;
+    plugin.app.internalPlugins.getPluginById("command-palette").instance.modal.onClose = () => {
+        setTimeout(() => {
+            document.removeEventListener("keyup", keyupEventListener)
+        }, 400);// without timer enter is not working when selecting an item before
+        closeModal.apply(modal);
+    };
+}
 
-    onChooseSuggestion(cmd: LastCommand, evt: MouseEvent | KeyboardEvent) {
-        this.plugin.app.commands.executeCommandById(`${cmd[0]}`)
-    }
+function getModalCmdVars(plugin: RepeatLastCommands) {
+    const pluginCommand = plugin.app.internalPlugins.getPluginById("command-palette")
+    const instance = pluginCommand.instance
+    const modal = instance.modal
+    return { modal, instance, pluginCommand }
 }
 
 export function getCommandName(id: string) {
