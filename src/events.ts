@@ -1,3 +1,4 @@
+import { Console } from "./Console"
 import {  getConditions, getModalCmdVars } from "./cmd-utils"
 import RepeatLastCommands from "./main"
 import { aliasModal } from "./modals"
@@ -17,7 +18,7 @@ async function addAlias(plugin: RepeatLastCommands, result: string, selectedItem
         const existingValue = existingAlias[1];
         // Console.log("existingValue", existingValue)
         if (value === "") {
-            text = `${commandName.replace(`{${existingValue}} `, "")}`
+            text = `${commandName.replace(`{${existingValue}}`, "")}`.trim()
             delete aliases[selectedId];
         }
         else {
