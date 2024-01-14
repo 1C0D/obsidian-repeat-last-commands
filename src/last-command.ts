@@ -1,3 +1,6 @@
+// item selection after operation
+// repair remove alias
+
 import { around } from "monkey-around";
 import { Command } from "obsidian";
 import RepeatLastCommands from "./main";
@@ -75,7 +78,7 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
             if (Object.keys(aliases).length) {
                 aliasify(values, aliases)
             }
-            if (plugin.lastCommands.length) {
+            if (plugin.lastCommands.length && values) {
                 for (const value of values) {
                     if (plugin.lastCommands.includes(value.item.id)) {
                         value.item.name.startsWith("*") ? null :
@@ -85,8 +88,10 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
                     }
                 }
                 for (const id of plugin.lastCommands) {
-                    if (values.find((value: any) => value.item.id === id)) {
-                        values.item.name = "*" + values.item.name
+                    const value = values.find((value: any) => value.item.id === id)
+                    if (value) {
+                        value.item.name.startsWith("*") ? null :
+                        value.item.name = "*" + value.item.name
                     }
                     values.push({ item: { id, name: id } })
                 }
