@@ -12,4 +12,7 @@ setting: max of commands to show in settings
 - add Aliases to your commands pressing ALT   
 ![demo](./ressources/aliases.mp4)
 
+- last commands at top of the command palette (settings option)  
+![mostrecent](./ressources/most%20recent.png)
+
 - for devs, you can run "copy last command id in clipboard". id is appearing in repeat last commands too.

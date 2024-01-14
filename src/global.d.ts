@@ -3,7 +3,8 @@ import 'obsidian'
 interface RLCSettings {
     maxLastCmds: number;
     notify: boolean;
-    aliases: Record<string, Record<string, string>>
+    aliases: Record<string, Record<string, string>>;
+    sort: boolean
 }
 
 type LastCommand = [string, string][]

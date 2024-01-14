@@ -42,14 +42,16 @@ function getRejectedCondition(id: string) {
 
 function applySelectedId(id: string, plugin: RepeatLastCommands) {
     // command
+    const { lastCommands, settings } = plugin
     plugin.lastCommand = id
+
     // commands
-    const maxEntries = plugin.settings.maxLastCmds;
-    if (plugin.lastCommands.length > maxEntries) {
-        plugin.lastCommands.shift();
+    const maxEntries = settings.maxLastCmds;
+    if (lastCommands.length > maxEntries) {
+        lastCommands.shift();
     }
-    plugin.lastCommands.push(id)
-    plugin.lastCommands = [...new Set(plugin.lastCommands)];
+    lastCommands.push(id)
+    plugin.lastCommands = [...new Set(lastCommands)];
     plugin.saveSettings()
 }
 
@@ -57,49 +59,61 @@ function applySelectedId(id: string, plugin: RepeatLastCommands) {
 export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastCommands) {
     const { modal, instance, pluginCommand } = getModalCmdVars(plugin)
     const { values, aliases, chooser } = getConditions(plugin)
+    const settings = plugin.settings
     // Console.log("aliases", aliases)
     const selectedItem = chooser.selectedItem
     Console.log("selectedItem", selectedItem)
 
     // suggestion values matching aliases
-    if (Object.keys(aliases).length)
-        // || lastCommands.length
-         {
+    if (Object.keys(aliases).length || settings.sort) {
         setTimeout(async () => {
             if (Object.keys(aliases).length) {
                 aliasify(values, aliases)
             }
-            // if (lastCommands.length) {
-            //     values = sortValues(plugin, values, aliases)
-            // }
-            await modal.updateSuggestions()
-        }, 0);
-    }
-
-    if (e instanceof KeyboardEvent && e.key !== "Enter" && e.key !== "Tab" && e.key !== "Alt") return
-    
-
-    if (e instanceof KeyboardEvent && e.key === "Alt") {
-        altEvent(e as KeyboardEvent, plugin, selectedItem)
-    }
-
-    const selectedId = chooser.values[selectedItem]?.item.id    
-    if (e instanceof KeyboardEvent && e.key === "Tab") {
-        if (!modal.win) return
-        const pinned = instance.options.pinned
-        if (pinned.includes(selectedId)) {
-            pinned.remove(selectedId)
-        } else {
-            instance.options.pinned.push(selectedId)
+            if (plugin.lastCommands.length) {
+                for (const value of values) {
+                    if (plugin.lastCommands.includes(value.item.id)) {value.item.name.startsWith("*") ? null :
+                        value.item.name = "*" + value.item.name
+                }else{
+                    if(value.item.name.startsWith("*")) value.item.name = value.item.name.substring(1)
+                }
+            }
+            for (const id of plugin.lastCommands) {
+                if (values.find((value: any) => value.item.id === id)) {
+                    values.item.name = "*" + values.item.name
+                }
+                values.push({ item: { id, name: id } })
+            }
         }
-        instance.saveSettings(pluginCommand)
-        modal.updateSuggestions()
-        return
+            instance.saveSettings(pluginCommand)
+            await modal.updateSuggestions()
+        }, 200);
+}
+
+if (e instanceof KeyboardEvent && e.key !== "Enter" && e.key !== "Tab" && e.key !== "Alt") return
+
+
+if (e instanceof KeyboardEvent && e.key === "Alt") {
+    altEvent(e as KeyboardEvent, plugin, selectedItem)
+}
+
+const selectedId = chooser.values[selectedItem]?.item.id
+if (e instanceof KeyboardEvent && e.key === "Tab") {
+    if (!modal.win) return
+    const pinned = instance.options.pinned
+    if (pinned.includes(selectedId)) {
+        pinned.remove(selectedId)
+    } else {
+        instance.options.pinned.push(selectedId)
     }
-    
-    const rejectedIds = getRejectedCondition(selectedId)
-    if (rejectedIds) return
-    applySelectedId(selectedId, plugin)
+    instance.saveSettings(pluginCommand)
+    modal.updateSuggestions()
+    return
+}
+
+const rejectedIds = getRejectedCondition(selectedId)
+if (rejectedIds) return
+applySelectedId(selectedId, plugin)
 }
 
 

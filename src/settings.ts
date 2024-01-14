@@ -22,6 +22,7 @@ export class RLCSettingTab extends PluginSettingTab {
                         await this.plugin.saveSettings();
                     });
             })
+
         new Setting(El)
             .setName("repeat last command: notify last command")
             .addToggle((toggle) => {
@@ -29,6 +30,18 @@ export class RLCSettingTab extends PluginSettingTab {
                     .setValue(this.plugin.settings.notify)
                     .onChange(async (value) => {
                         this.plugin.settings.notify = value
+                        await this.plugin.saveSettings();
+                    })
+            })
+
+        new Setting(El)
+            .setName("Recently used commands at top of command palette")
+            .setDesc("depending on the number of last commands")
+            .addToggle((toggle) => {
+                toggle
+                    .setValue(this.plugin.settings.sort)
+                    .onChange(async (value) => {
+                        this.plugin.settings.sort = value
                         await this.plugin.saveSettings();
                     })
             })
