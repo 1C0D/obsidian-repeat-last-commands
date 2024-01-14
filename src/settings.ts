@@ -47,7 +47,7 @@ export class RLCSettingTab extends PluginSettingTab {
             })
         new Setting(El)
             .setName("Add last command(s) exeptions IDs (seperated by new line)")  
-            .setDesc("ex: 'repeat-last-commands:repeat-command' or just repeat-last-commands → all commands from this plugin. tips: use 'Copy last command id in clipbooard'to get last command id") 
+            .setDesc("ex: 'repeat-last-commands:repeat-command' or just 'repeat-last-commands' → all commands from this plugin. tips: use 'Copy last command id in clipbooard'to get last command id") 
             .addTextArea((text) => {
                 text            
                     .setValue(this.plugin.settings.userExcludedIDs.join("\n"))

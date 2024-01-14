@@ -18,5 +18,6 @@ setting: max of commands to show in settings
 - prevent some commands to be included in last command(s), in settings filling the textarea in settings. 1 by line. 
 You can give a whole command. e.g: 'repeat-last-commands:repeat-command'  
 or just 'repeat-last-commands' to block all commands from this plugin.
+![excluded](excluded.png)
 
 - for devs, you can run "copy last command id in clipboard". id is appearing in repeat last commands too.
