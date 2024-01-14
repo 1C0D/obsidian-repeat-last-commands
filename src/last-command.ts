@@ -9,6 +9,7 @@ import { aliasify, getBackSelection, getConditions } from "./cmd-utils";
 import { Console } from "./Console";
 
 function addCPListeners(plugin: RepeatLastCommands) {//command palette
+    addInfoPalette(plugin)
     addClickListener(plugin)
     addKeyboardListener(plugin)
 }
@@ -64,7 +65,7 @@ function applySelectedId(id: string, plugin: RepeatLastCommands) {
 
 export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastCommands) {
     const { modal, instance, pluginCommand } = getModalCmdVars(plugin)
-    console.log("modal", modal)
+    // console.log("modal", modal)
     const { values, aliases, chooser } = getConditions(plugin)
     const settings = plugin.settings
     // Console.log("aliases", aliases)
@@ -77,26 +78,31 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
             if (Object.keys(aliases).length) {
                 aliasify(values, aliases)
             }
-            if (plugin.lastCommands.length && values) {
+            if (settings.sort && plugin.lastCommands.length && values) {
+                // starify
                 for (const value of values) {
                     if (plugin.lastCommands.includes(value.item.id)) {
-                        value.item.name.startsWith("*") ? null :
-                        value.item.name = "*" + value.item.name
+                        if (!value.item.name.startsWith("*")) {
+                            value.item.name = "*" + value.item.name
+                        }
                     } else {
-                        if (value.item.name.startsWith("*")) value.item.name = value.item.name.substring(1)
+                        if (value.item.name.startsWith("*")) {
+                            value.item.name = value.item.name.substring(1)
+                        }
                     }
                 }
-                for (const id of plugin.lastCommands) {
-                    const value = values.find((value: any) => value.item.id === id)
-                    if (value) {
-                        value.item.name.startsWith("*") ? null :
-                        value.item.name = "*" + value.item.name
-                    }
-                    values.push({ item: { id, name: id } })
-                }
+                //
+                // for (const id of plugin.lastCommands) {
+                //     const value = values.find((value: any) => value.item.id === id)
+                //     if (value) {
+                //         value.item.name.startsWith("*") ? null :
+                //             value.item.name = "*" + value.item.name
+                //     }
+                //     values.push({ item: { id, name: id } })
+                // }
             }
             instance.saveSettings(pluginCommand)
-            
+
             await modal.updateSuggestions()
         }, 200);
     }
@@ -119,7 +125,7 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
         }
         instance.saveSettings(pluginCommand)
         setTimeout(() => {
-            getBackSelection(chooser, selectedItem)            
+            getBackSelection(chooser, selectedItem)
         }, 300);
         return
     }
@@ -163,8 +169,21 @@ export function getCommandName(id: string) {
     for (const key in this.app.commands.commands) {
         const command = this.app.commands.commands[key];
         if (command.id === id) {
+            command.name.startsWith("*") ? command.name = command.name.substring(1) : null
             return command.name;
         }
     }
     return null;
+}
+
+function addInfoPalette(plugin: RepeatLastCommands) {
+    const { modal } = getModalCmdVars(plugin);
+    const resultContainerEl = modal.resultContainerEl;
+
+    if (!plugin.infoDiv) {
+        plugin.infoDiv = document.createElement('div');
+        plugin.infoDiv.classList.add('result-container-afterend');
+        plugin.infoDiv.textContent = "Alt: add command alias | Tab: toggle command pinning";
+        resultContainerEl.insertAdjacentElement("afterend", plugin.infoDiv);
+    }
 }

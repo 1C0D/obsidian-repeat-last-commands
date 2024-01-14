@@ -44,15 +44,22 @@ async function addAlias(plugin: RepeatLastCommands, result: string, selectedItem
     chooser.values[selectedItem].item.name = text
 
     const { modal, instance, cmdPalette } = getModalCmdVars(plugin)
-    // commands[selectedId].name = text;
+    if (!plugin.wasStared) {
+        const name = chooser.values[selectedItem].item.name
+        chooser.values[selectedItem].item.name = name.substring(1)
+        plugin.lastCommands.remove(selectedId)
+        plugin.lastCommand = null
+    }
+    plugin.wasStared = false
     await plugin.saveSettings();
-    await instance.saveSettings(cmdPalette) // save so the rendering is up to date    
+    // await instance.saveSettings(cmdPalette) // save so the rendering is up to date    
     await modal.updateSuggestions()
 }
 
 
 export function altEvent(e: KeyboardEvent, plugin: RepeatLastCommands, selectedItem: number, chooser: any) {
-
+    const name = chooser.values[selectedItem].item.name
+    if (name.startsWith("*")) plugin.wasStared = true
     new aliasModal(plugin.app, plugin, selectedItem, async(result) => {
         await addAlias(plugin, result, selectedItem)
         getBackSelection(chooser, selectedItem)

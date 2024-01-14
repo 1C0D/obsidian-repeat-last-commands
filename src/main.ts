@@ -4,17 +4,18 @@ import { RLCSettingTab } from './settings';
 import { RLCSettings } from './global';
 import { DEFAULT_SETTINGS } from './variables';
 import { LastCommandsModal } from './modals';
+import { Console } from './Console';
 
 export default class RepeatLastCommands extends Plugin {
 	settings: RLCSettings;
 	lastCommand: string | null
 	lastCommands: string[] = []
+	infoDiv: HTMLDivElement | null
+	wasStared: boolean
 
 	async onload() {
 		await this.loadSettings();
 		this.addSettingTab(new RLCSettingTab(this));
-
-
 		this.register(onCommandTrigger(this))
 
 		this.addCommand({
@@ -25,6 +26,7 @@ export default class RepeatLastCommands extends Plugin {
 					if (this.settings.notify) {
 						new Notice(`Repeated: ${getCommandName(this.lastCommand)}`)
 					};
+					Console.log("this.lastCommand", this.lastCommand)
 					this.app.commands.executeCommandById(this.lastCommand)
 				}
 				else new Notice("No last command")

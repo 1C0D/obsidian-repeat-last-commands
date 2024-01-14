@@ -1,3 +1,11 @@
-.alias-input{
+.alias-input {
     margin: 10px;
+}
+
+.result-container-afterend {
+    border-top: 1px solid black;
+    text-align: center;
+    font-style: italic;
+    color: gray;
+    font-size: 0.8rem;
 }
