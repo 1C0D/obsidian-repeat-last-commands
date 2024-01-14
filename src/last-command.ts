@@ -12,7 +12,7 @@ function addCPListeners(plugin: RepeatLastCommands) {//command palette
 
 function onHKTrigger(plugin: RepeatLastCommands, id: string) {// after shortcut
     const { modal } = getModalCmdVars(plugin)
-    if (!modal.win && !getRejectedCondition(id)) {
+    if (!modal.win && !getRejectedCondition(plugin, id)) {
         applySelectedId(id!, plugin)
     }
 }
@@ -32,13 +32,18 @@ export function onCommandTrigger(plugin: RepeatLastCommands) {//notice we must p
     return uninstallCommand;
 }
 
-function getRejectedCondition(id: string) {
+function getRejectedCondition(plugin: RepeatLastCommands, id: string) {
+    const userExcludedIDs = plugin.settings.userExcludedIDs;
+
     return (
         id === "repeat-last-commands:repeat-command" ||
         id === "repeat-last-commands:repeat-commands" ||
-        id === "repeat-last-commands:get-last-command"
+        id === "repeat-last-commands:get-last-command" ||
+        userExcludedIDs.some(excludedID => id.startsWith(excludedID))
     )
 }
+
+
 
 function applySelectedId(id: string, plugin: RepeatLastCommands) {
     // command
@@ -72,48 +77,49 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
             }
             if (plugin.lastCommands.length) {
                 for (const value of values) {
-                    if (plugin.lastCommands.includes(value.item.id)) {value.item.name.startsWith("*") ? null :
+                    if (plugin.lastCommands.includes(value.item.id)) {
+                        value.item.name.startsWith("*") ? null :
                         value.item.name = "*" + value.item.name
-                }else{
-                    if(value.item.name.startsWith("*")) value.item.name = value.item.name.substring(1)
+                    } else {
+                        if (value.item.name.startsWith("*")) value.item.name = value.item.name.substring(1)
+                    }
+                }
+                for (const id of plugin.lastCommands) {
+                    if (values.find((value: any) => value.item.id === id)) {
+                        values.item.name = "*" + values.item.name
+                    }
+                    values.push({ item: { id, name: id } })
                 }
             }
-            for (const id of plugin.lastCommands) {
-                if (values.find((value: any) => value.item.id === id)) {
-                    values.item.name = "*" + values.item.name
-                }
-                values.push({ item: { id, name: id } })
-            }
-        }
             instance.saveSettings(pluginCommand)
             await modal.updateSuggestions()
         }, 200);
-}
-
-if (e instanceof KeyboardEvent && e.key !== "Enter" && e.key !== "Tab" && e.key !== "Alt") return
-
-
-if (e instanceof KeyboardEvent && e.key === "Alt") {
-    altEvent(e as KeyboardEvent, plugin, selectedItem)
-}
-
-const selectedId = chooser.values[selectedItem]?.item.id
-if (e instanceof KeyboardEvent && e.key === "Tab") {
-    if (!modal.win) return
-    const pinned = instance.options.pinned
-    if (pinned.includes(selectedId)) {
-        pinned.remove(selectedId)
-    } else {
-        instance.options.pinned.push(selectedId)
     }
-    instance.saveSettings(pluginCommand)
-    modal.updateSuggestions()
-    return
-}
 
-const rejectedIds = getRejectedCondition(selectedId)
-if (rejectedIds) return
-applySelectedId(selectedId, plugin)
+    if (e instanceof KeyboardEvent && e.key !== "Enter" && e.key !== "Tab" && e.key !== "Alt") return
+
+
+    if (e instanceof KeyboardEvent && e.key === "Alt") {
+        altEvent(e as KeyboardEvent, plugin, selectedItem)
+    }
+
+    const selectedId = chooser.values[selectedItem]?.item.id
+    if (e instanceof KeyboardEvent && e.key === "Tab") {
+        if (!modal.win) return
+        const pinned = instance.options.pinned
+        if (pinned.includes(selectedId)) {
+            pinned.remove(selectedId)
+        } else {
+            instance.options.pinned.push(selectedId)
+        }
+        instance.saveSettings(pluginCommand)
+        modal.updateSuggestions()
+        return
+    }
+
+    const rejectedIds = getRejectedCondition(plugin, selectedId)
+    if (rejectedIds) return
+    applySelectedId(selectedId, plugin)
 }
 
 

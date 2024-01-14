@@ -4,5 +4,6 @@ export const DEFAULT_SETTINGS: RLCSettings = {
     maxLastCmds: 4,
     notify: true,
     aliases:{},
-    sort: true
+    sort: true,
+    userExcludedIDs: []
 }

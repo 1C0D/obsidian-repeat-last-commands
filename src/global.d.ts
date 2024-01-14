@@ -4,7 +4,8 @@ interface RLCSettings {
     maxLastCmds: number;
     notify: boolean;
     aliases: Record<string, Record<string, string>>;
-    sort: boolean
+    sort: boolean;
+    userExcludedIDs: string[]
 }
 
 type LastCommand = [string, string][]
