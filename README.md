@@ -1,6 +1,6 @@
 # Repeat Last Command(s)
 
-![demo](demo.mp4)
+![demo](./ressources/demo.mp4)
 
 - repeat last command (suggestion: Ctrl Shift P)  
 setting: notify what command was
