@@ -1,5 +1,7 @@
 # Repeat Last Command(s)
 
+![demo](demo.mp4)
+
 - repeat last command (suggestion: Ctrl Shift P)  
 setting: notify what command was
 
@@ -10,7 +12,7 @@ setting: max of commands to show in settings
 - toggle pinned commands pressing TAB
 
 - add Aliases to your commands pressing ALT   
-![demo](./ressources/aliases.mp4)
+![aliases](./ressources/aliases.mp4)
 
 - last commands at top of the command palette (settings option)  
 ![mostrecent](./ressources/most%20recent.png)
