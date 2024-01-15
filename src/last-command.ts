@@ -92,7 +92,7 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
             if (Object.keys(aliases).length) {
                 aliasify(values, aliases)
             }
-            
+
             await modal.updateSuggestions()
             instance.saveSettings(pluginCommand)
         }, 400);
@@ -117,7 +117,8 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
         instance.saveSettings(pluginCommand)
         setTimeout(() => {
             getBackSelection(chooser, selectedItem)
-        }, 300);
+        }, 400);
+
         return
     }
 

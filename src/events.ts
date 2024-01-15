@@ -48,8 +48,7 @@ async function addAlias(plugin: RepeatLastCommands, result: string, selectedItem
 
     const { modal, instance, cmdPalette } = getModalCmdVars(plugin)
     if (!plugin.wasStared) {
-        // const name = chooser.values[selectedItem].item.name
-        // chooser.values[selectedItem].item.name = name.substring(1)
+
         plugin.lastCommands.remove(selectedId)
         plugin.lastCommand = null
     }
