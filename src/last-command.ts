@@ -1,6 +1,3 @@
-// item selection after operation
-// repair remove alias
-
 import { around } from "monkey-around";
 import { Command } from "obsidian";
 import RepeatLastCommands from "./main";
