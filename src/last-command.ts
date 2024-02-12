@@ -73,9 +73,14 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
     // suggestion values matching aliases
     if (Object.keys(aliases).length || settings.sort) {
         setTimeout(async () => {
+            if (Object.keys(aliases).length) {
+                aliasify(values, aliases)
+            }
             if (settings.sort && plugin.lastCommands.length && values) {
                 // starify
                 for (const value of values) {
+                    console.log("value.item.id", value.item.id)
+                    console.log("value.item.name", value.item.name)
                     if (plugin.lastCommands.includes(value.item.id)) {
                         if (!value.item.name.startsWith("*")) {
                             value.item.name = "*" + value.item.name
@@ -87,10 +92,6 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
                     }
                 }
             }
-            if (Object.keys(aliases).length) {
-                aliasify(values, aliases)
-            }
-
             await modal.updateSuggestions()
             instance.saveSettings(pluginCommand)
         }, 400);
