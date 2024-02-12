@@ -63,7 +63,6 @@ function applySelectedId(id: string, plugin: RepeatLastCommands) {
 export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastCommands) {
     if (e instanceof KeyboardEvent && (e.key === "ArrowDown" || e.key === "ArrowUp")) return
     const { modal, instance, pluginCommand } = getModalCmdVars(plugin)
-    // console.log("modal", modal)
     const { values, aliases, chooser } = getConditions(plugin)
     const settings = plugin.settings
     // Console.log("aliases", aliases)
@@ -79,8 +78,6 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
             if (settings.sort && plugin.lastCommands.length && values) {
                 // starify
                 for (const value of values) {
-                    console.log("value.item.id", value.item.id)
-                    console.log("value.item.name", value.item.name)
                     if (plugin.lastCommands.includes(value.item.id)) {
                         if (!value.item.name.startsWith("*")) {
                             value.item.name = "*" + value.item.name
