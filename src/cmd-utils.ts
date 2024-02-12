@@ -4,7 +4,7 @@ import RepeatLastCommands from "./main"
 export function getConditions(plugin: RepeatLastCommands) {
     const { modal } = getModalCmdVars(plugin)
     const chooser = modal.chooser
-    Console.debug("chooser", chooser) // important to see structure and add icons? status bar
+    // Console.debug("chooser", chooser) // important to see structure and add icons? status bar
     const values = chooser.values// id, name, icon
     const { aliases } = plugin.settings
     return { values, aliases, chooser }

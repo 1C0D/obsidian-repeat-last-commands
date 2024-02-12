@@ -64,6 +64,7 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
     if (e instanceof KeyboardEvent && (e.key === "ArrowDown" || e.key === "ArrowUp")) return
     const { modal, instance, pluginCommand } = getModalCmdVars(plugin)
     const { values, aliases, chooser } = getConditions(plugin)
+    if(!values) return
     const settings = plugin.settings
     // Console.log("aliases", aliases)
     const selectedItem = chooser.selectedItem
@@ -100,8 +101,8 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
     if (e instanceof KeyboardEvent && e.key === "Alt") {
         altEvent(e as KeyboardEvent, plugin, selectedItem, chooser)
     }
-
-    const selectedId = chooser.values[selectedItem]?.item.id
+    
+    const selectedId = values[selectedItem]?.item.id
     if (e instanceof KeyboardEvent && e.key === "Tab") {
         if (!modal.win) return
         const pinned = instance.options.pinned

@@ -64,6 +64,7 @@ export function altEvent(e: KeyboardEvent, plugin: RepeatLastCommands, selectedI
     if (name.startsWith("*")) plugin.wasStared = true
     new aliasModal(plugin.app, plugin, selectedItem, async(result) => {
         await addAlias(plugin, result, selectedItem)
-        getBackSelection(chooser, selectedItem)
-    }, 300).open()
+        setTimeout(() => { getBackSelection(chooser, selectedItem) 
+        }, 600)        
+    }).open()
 }
