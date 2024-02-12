@@ -1,1 +1,1 @@
-fix arrow up down
+fix add star when alias in command palette for sort
