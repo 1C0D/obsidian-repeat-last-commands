@@ -1,1 +1,1 @@
-alias modal: enter shortcut added to validate
+fix: selection back after alias
