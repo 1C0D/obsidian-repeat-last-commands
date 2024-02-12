@@ -35,6 +35,17 @@ export class RLCSettingTab extends PluginSettingTab {
             })
 
         new Setting(El)
+            .setName("repeat last command(s): if no last command, open command palette instead")
+            .addToggle((toggle) => {
+                toggle
+                    .setValue(this.plugin.settings.notify)
+                    .onChange(async (value) => {
+                        this.plugin.settings.afterNoCmdOpenCmdPalette = value
+                        await this.plugin.saveSettings();
+                    })
+            })
+
+        new Setting(El)
             .setName("Recently used commands at top of command palette")
             .setDesc("depending on the number of last commands")
             .addToggle((toggle) => {
@@ -45,6 +56,7 @@ export class RLCSettingTab extends PluginSettingTab {
                         await this.plugin.saveSettings();
                     })
             })
+            
         new Setting(El)
             .setName("Add last command(s) exeptions IDs (seperated by new line)")  
             .setDesc("ex: 'repeat-last-commands:repeat-command' or just 'repeat-last-commands' → all commands from this plugin. tips: use 'Copy last command id in clipbooard'to get last command id") 

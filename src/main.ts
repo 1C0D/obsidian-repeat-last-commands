@@ -29,7 +29,11 @@ export default class RepeatLastCommands extends Plugin {
 					Console.log("this.lastCommand", this.lastCommand)
 					this.app.commands.executeCommandById(this.lastCommand)
 				}
-				else new Notice("No last command")
+				else {
+					new Notice("No last command")
+					if (this.settings.afterNoCmdOpenCmdPalette)
+						setTimeout(() => { this.app.commands.executeCommandById("command-palette:open") }, 1000)
+				}
 			},
 		});
 
@@ -38,7 +42,11 @@ export default class RepeatLastCommands extends Plugin {
 			name: "Repeat commands",
 			callback: async () => {
 				if (this.lastCommands.length) new LastCommandsModal(this).open()
-				else new Notice("No last command")
+				else {
+					new Notice("No last command")
+					if (this.settings.afterNoCmdOpenCmdPalette) 
+					setTimeout(() => { this.app.commands.executeCommandById("command-palette:open") }, 1000)
+				}
 			},
 		});
 
