@@ -1,1 +1,1 @@
-fix: selection back after alias
+settings: open command palette after no last commmand(s)
