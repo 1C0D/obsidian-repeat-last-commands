@@ -1,1 +1,1 @@
-fix add star when alias in command palette for sort
+fix add star when alias in command palette for sort (less console.logs)
