@@ -6,7 +6,7 @@ interface RLCSettings {
     aliases: Record<string, Record<string, string>>;
     sort: boolean;
     userExcludedIDs: string[];
-    afterNoCmdOpenCmdPalette: boolean
+    ifNoCmdOpenCmdPalette: boolean
 }
 
 type LastCommand = [string, string][]
