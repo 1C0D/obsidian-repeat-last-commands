@@ -1,1 +1,1 @@
-fix add star when alias in command palette for sort (less console.logs)
+alias modal: enter shortcut added to validate
