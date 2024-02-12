@@ -1,6 +1,8 @@
 import esbuild from "esbuild";
 import process from "process";
 import builtins from "builtin-modules";
+import * as dotenv from 'dotenv';
+dotenv.config()
 
 const banner =
 	`/*

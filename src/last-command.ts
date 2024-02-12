@@ -61,6 +61,7 @@ function applySelectedId(id: string, plugin: RepeatLastCommands) {
 
 
 export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastCommands) {
+    if (e instanceof KeyboardEvent && (e.key === "ArrowDown" || e.key === "ArrowUp")) return
     const { modal, instance, pluginCommand } = getModalCmdVars(plugin)
     // console.log("modal", modal)
     const { values, aliases, chooser } = getConditions(plugin)
