@@ -1,4 +1,4 @@
-import { App, Modal, Setting, SuggestModal, TextComponent } from "obsidian";
+import { App, Modal, Scope, Setting, SuggestModal, TextComponent } from "obsidian";
 import { getCommandName } from "./last-command";
 import RepeatLastCommands from "./main";
 import { LastCommand } from "./global";
@@ -34,6 +34,11 @@ export class aliasModal extends Modal {
     constructor(app: App, public plugin: RepeatLastCommands,
         public selectedItem: number, public onSubmit: (result: string) => void, public width?: number) {
         super(app);
+        this.scope = new Scope(this.scope);
+        this.scope.register([], "Enter", (evt, ctx) => {
+            this.close();
+            this.onSubmit(this.result);
+        });
         if (this.width) {
             this.modalEl.style.width = `${this.width}px`;
         }
