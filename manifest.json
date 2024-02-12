@@ -1,7 +1,7 @@
 {
 	"id": "repeat-last-commands",
 	"name": "Repeat Last Command(s)",
-	"version": "2.3.0",
+	"version": "2.3.1",
 	"minAppVersion": "0.15.0",
 	"description": "Repeat last command or commands. toggle pinned command with tab. get last command id",
 	"author": "1C0D",
