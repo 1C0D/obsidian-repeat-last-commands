@@ -1,1 +1,0 @@
-settings: open command palette after no last commmand(s)

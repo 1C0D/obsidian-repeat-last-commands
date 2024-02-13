@@ -16,7 +16,8 @@ export class RLCSettingTab extends PluginSettingTab {
             .addSlider((slider) => {
                 slider
                     .setLimits(2, 12, 1)
-                    .setValue(this.plugin.settings.maxLastCmds)
+                    .setValue((this.plugin.settings.maxLastCmds))
+                    .setDynamicTooltip()
                     .onChange(async (value) => {
                         this.plugin.settings.maxLastCmds = value;
                         await this.plugin.saveSettings();
@@ -41,6 +42,17 @@ export class RLCSettingTab extends PluginSettingTab {
                     .setValue(this.plugin.settings.notify)
                     .onChange(async (value) => {
                         this.plugin.settings.ifNoCmdOpenCmdPalette = value
+                        await this.plugin.saveSettings();
+                    })
+            })
+
+        new Setting(El)
+            .setName("repeat last command(s): add command palette open as last command")
+            .addToggle((toggle) => {
+                toggle
+                    .setValue(this.plugin.settings.notify)
+                    .onChange(async (value) => {
+                        this.plugin.settings.includeCmdPaletteOPen = value
                         await this.plugin.saveSettings();
                     })
             })

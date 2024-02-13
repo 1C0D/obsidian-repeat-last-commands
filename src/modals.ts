@@ -11,7 +11,11 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
     }
 
     getSuggestions(query: string): LastCommand[] {
-        const lastCommandsArr = this.plugin.lastCommands.map(id => [id, getCommandName(id)]).reverse();
+        let lastCommandsArr = this.plugin.lastCommands.map(id => [id, getCommandName(id)]).reverse();
+        // console.log("this.lastCommands", this.lastCommands)
+        if (this.plugin.settings.includeCmdPaletteOPen) {
+            lastCommandsArr = [...lastCommandsArr, ["command-palette:open", "Open Command Palette"]]
+        }
         return lastCommandsArr.filter(cmd =>
             cmd[1].toLowerCase().includes(query.toLowerCase())
         );
