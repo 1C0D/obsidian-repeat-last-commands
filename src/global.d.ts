@@ -7,7 +7,8 @@ interface RLCSettings {
     sort: boolean;
     userExcludedIDs: string[];
     ifNoCmdOpenCmdPalette: boolean;
-    includeCmdPaletteOPen: boolean
+    includeCmdPaletteOPen: boolean;
+    showCmdId: boolean
 }
 
 type LastCommand = [string, string][]

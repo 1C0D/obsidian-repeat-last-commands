@@ -23,7 +23,8 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
 
     renderSuggestion(cmd: LastCommand, el: HTMLElement) {
         el.createEl("div", { text: `${cmd[1]}` });
-        el.createEl("small", { text: `${cmd[0]}` });
+        if(this.plugin.settings.showCmdId)
+        el.createEl("div", { text: `${cmd[0]}`, cls: "id-suggest" });
     }
 
     onChooseSuggestion(cmd: LastCommand, evt: MouseEvent | KeyboardEvent) {

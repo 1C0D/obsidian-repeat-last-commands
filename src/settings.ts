@@ -47,12 +47,23 @@ export class RLCSettingTab extends PluginSettingTab {
             })
 
         new Setting(El)
-            .setName("repeat last command(s): add command palette open as last command")
+            .setName('repeat last command(s): add "open command palette" as last command')
             .addToggle((toggle) => {
                 toggle
                     .setValue(this.plugin.settings.notify)
                     .onChange(async (value) => {
                         this.plugin.settings.includeCmdPaletteOPen = value
+                        await this.plugin.saveSettings();
+                    })
+            })
+
+        new Setting(El)
+            .setName("repeat last command(s): show command id (2nd line)")
+            .addToggle((toggle) => {
+                toggle
+                    .setValue(this.plugin.settings.notify)
+                    .onChange(async (value) => {
+                        this.plugin.settings.showCmdId = value
                         await this.plugin.saveSettings();
                     })
             })
