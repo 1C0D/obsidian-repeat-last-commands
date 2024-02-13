@@ -1,2 +1,1 @@
-open command palette added to modal last commands (settings option)
-fix: settings: slider number commands info
+feature: show command id as an settings option in repeat last commands modal
