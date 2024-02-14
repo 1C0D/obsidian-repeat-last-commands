@@ -12,7 +12,6 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
 
     getSuggestions(query: string): LastCommand[] {
         let lastCommandsArr = this.plugin.lastCommands.map(id => [id, getCommandName(id)]).reverse();
-        // console.log("this.lastCommands", this.lastCommands)
         if (this.plugin.settings.includeCmdPaletteOPen) {
             lastCommandsArr = [...lastCommandsArr, ["command-palette:open", "Open Command Palette"]]
         }
@@ -22,9 +21,20 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
     }
 
     renderSuggestion(cmd: LastCommand, el: HTMLElement) {
-        el.createEl("div", { text: `${cmd[1]}` });
-        if(this.plugin.settings.showCmdId)
-        el.createEl("div", { text: `${cmd[0]}`, cls: "id-suggest" });
+        if (cmd[1].includes(":")) {
+            const [name, command] = cmd[1].toString().split(":");
+            el.createEl("div", {
+                cls: "cmd-suggest",
+            }, (cont) => {
+                cont.createEl("span", { text: `${name}:`, cls: "cmd-suggest-name" });
+                cont.createEl("span", { text: `${command}`, cls: "cmd-suggest-cmd" });
+            });
+        } else {
+            el.createEl("div", { text: `${cmd[1]}`, cls: "cmd-alone" });
+        }
+
+        if (this.plugin.settings.showCmdId)
+            el.createEl("div", { text: `${cmd[0]}`, cls: "id-suggest" });
     }
 
     onChooseSuggestion(cmd: LastCommand, evt: MouseEvent | KeyboardEvent) {

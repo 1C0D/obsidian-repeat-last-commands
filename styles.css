@@ -15,3 +15,20 @@
     color: gray;
     font-size: 0.8rem;
 }
+
+/* if you want to add style to the result container for last commands
+to the plugin name: command name */
+
+.cmd-suggest-name{
+    color: rgb(116, 111, 247);
+    font-weight: bold;
+}
+
+/* .cmd-suggest-cmd{
+    color: rgb(174, 171, 206);
+} */
+
+/* obsidian commands  alone*/
+.cmd-alone {
+    color: rgb(181, 143, 198);
+}
