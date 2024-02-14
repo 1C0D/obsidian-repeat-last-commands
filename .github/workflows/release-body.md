@@ -1,1 +1,1 @@
-feature: show command id as an settings option in repeat last commands modal
+requested feature: css styles for last commands
