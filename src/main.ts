@@ -32,11 +32,9 @@ export default class RepeatLastCommands extends Plugin {
 					this.app.commands.executeCommandById(this.lastCommand)
 				}
 				else {
-					new Notice(text)
+					new Notice(text, 2500)
 					if (this.settings.ifNoCmdOpenCmdPalette)
-						// setTimeout(() => { 
 					this.app.commands.executeCommandById("command-palette:open") 
-				// }, 800)
 				}
 			},
 		});
@@ -48,11 +46,9 @@ export default class RepeatLastCommands extends Plugin {
 				if (this.lastCommands.length){ 
 					new LastCommandsModal(this).open()}
 				else {
-					new Notice(text)
+					new Notice(text,2500)
 					if (this.settings.ifNoCmdOpenCmdPalette)
-						// setTimeout(() => { 
 					this.app.commands.executeCommandById("command-palette:open") 
-				// }, 800)
 				}
 			},
 		});
