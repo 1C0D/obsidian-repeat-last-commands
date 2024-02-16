@@ -8,7 +8,9 @@ import { Console } from "./Console";
 function addCPListeners(plugin: RepeatLastCommands) {//command palette
     addInfoPalette(plugin)
     addClickListener(plugin)
-    addKeyboardListener(plugin)
+    setTimeout(() => {
+        addKeyboardListener(plugin)        
+    }, 800);
 }
 
 function onHKTrigger(plugin: RepeatLastCommands, id: string) {// after shortcut
