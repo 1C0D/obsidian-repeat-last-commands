@@ -1,5 +1,6 @@
 import { PluginSettingTab, Setting } from "obsidian";
 import RepeatLastCommands from "./main";
+import { getCommandName, getCommandIds } from "./cmd-utils";
 
 export class RLCSettingTab extends PluginSettingTab {
     constructor(public plugin: RepeatLastCommands) {
@@ -35,7 +36,7 @@ export class RLCSettingTab extends PluginSettingTab {
                         this.plugin.settings.maxLastCmds = value;
                         await this.plugin.saveSettings();
                     });
-            })       
+            })
 
         new Setting(El)
             .setName("repeat last command(s): if no last command(s), then open command palette instead")
@@ -94,6 +95,26 @@ export class RLCSettingTab extends PluginSettingTab {
                         this.plugin.settings.sort = value
                         await this.plugin.saveSettings();
                     })
+            })
+
+        const excluded = this.plugin.settings.excludeCommands
+        let cmdNames: string[] = []
+        for (const id of excluded) {
+            cmdNames.push(getCommandName(id))
+        }
+        new Setting(El)
+            .setName("Excluded commands from command palette")
+            .addTextArea((text) => {
+                text
+                    .setValue(cmdNames.join("\n"))
+                text.inputEl.onblur = async () => {
+                    const textArray = text.getValue() ? text.getValue().trim().split("\n") : []
+                    const ids = getCommandIds(textArray)
+                    this.plugin.settings.excludeCommands = ids
+                    await this.plugin.saveSettings();
+                }
+                text.inputEl.setAttr("rows", 4)
+                text.inputEl.setAttr("cols", 40)
             })
     }
 }

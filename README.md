@@ -1,5 +1,8 @@
 # Repeat Last Command(s)
 
+New: hide commands and show them again
+![hideCmd](.ressources/hideCmd.gif)
+
 [demo](https://youtu.be/7-_vkC7-K9g)
 
 - repeat last command (suggestion: Ctrl Shift P)  

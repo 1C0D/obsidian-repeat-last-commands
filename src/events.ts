@@ -1,13 +1,13 @@
 import { Console } from "./Console"
-import {  getBackSelection, getConditions, getModalCmdVars } from "./cmd-utils"
+import { getBackSelection, getConditions, getModalCmdVars } from "./cmd-utils"
 import RepeatLastCommands from "./main"
-import { aliasModal } from "./modals"
+import { AliasModal } from "./modals"
 
 async function addAlias(plugin: RepeatLastCommands, result: string, selectedItem: number) {
     const { values, aliases, chooser } = getConditions(plugin)
     const { item } = values[selectedItem]
     const selectedId = item.id
-    const value = result?.trim()??""
+    const value = result?.trim() ?? ""
     const { commands } = this.app.commands
     const commandName = commands[selectedId].name
     let text;
@@ -23,7 +23,7 @@ async function addAlias(plugin: RepeatLastCommands, result: string, selectedItem
         }
         else {
             text = `${commandName.replace(`{${existingValue}}`, `{${value}}`)}`.trim();
-            if(!plugin.wasStared) text = text.substring(1)
+            if (!plugin.wasStared) text = text.substring(1)
             aliases[selectedId] = { name: text }
         }
     }
@@ -62,9 +62,16 @@ async function addAlias(plugin: RepeatLastCommands, result: string, selectedItem
 export function altEvent(e: KeyboardEvent, plugin: RepeatLastCommands, selectedItem: number, chooser: any) {
     const name = chooser.values[selectedItem].item.name
     if (name.startsWith("*")) plugin.wasStared = true
-    new aliasModal(plugin.app, plugin, selectedItem, async(result) => {
+    new AliasModal(plugin.app, plugin, selectedItem, async (result) => {
         await addAlias(plugin, result, selectedItem)
-        setTimeout(() => { getBackSelection(chooser, selectedItem) 
-        }, 600)        
+        setTimeout(() => {
+            getBackSelection(chooser, selectedItem)
+        }, 600)
     }).open()
+}
+
+export async function hideCmd(e: KeyboardEvent, plugin: RepeatLastCommands, selectedItem: number, chooser: any) {
+    const id = chooser.values[selectedItem].item.id
+    plugin.settings.excludeCommands.push(id)
+    await plugin.saveSettings();
 }

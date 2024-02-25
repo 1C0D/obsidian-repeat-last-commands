@@ -1,8 +1,7 @@
 import { App, Modal, Scope, Setting, SuggestModal, TextComponent } from "obsidian";
-import { getCommandName } from "./last-command";
 import RepeatLastCommands from "./main";
 import { LastCommand } from "./global";
-import { getConditions } from "./cmd-utils";
+import { getCommandIds, getCommandName, getConditions } from "./cmd-utils";
 
 export class LastCommandsModal extends SuggestModal<LastCommand> {
     constructor(public plugin: RepeatLastCommands) {
@@ -44,7 +43,7 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
 
 
 
-export class aliasModal extends Modal {
+export class AliasModal extends Modal {
     result: string;
     constructor(app: App, public plugin: RepeatLastCommands,
         public selectedItem: number, public onSubmit: (result: string) => void, public width?: number) {
@@ -90,5 +89,41 @@ export class aliasModal extends Modal {
     onClose() {
         const { contentEl } = this;
         contentEl.empty();
+    }
+}
+
+export class ShowAgainCmds extends Modal {
+    constructor(app: App, public plugin: RepeatLastCommands,
+        public modal: any, public width?: number) {
+        super(app);
+        if (this.width) {
+            this.modalEl.style.width = `${this.width}px`;
+        }
+    }
+    onOpen() {
+        const { contentEl } = this;
+        contentEl.empty();
+        const excluded = this.plugin.settings.excludeCommands
+        let cmdNames: string[] = []
+        for (const id of excluded) {
+            cmdNames.push(getCommandName(id))
+        }
+        new Setting(contentEl)
+            .setName("Excluded commands from command palette")
+            .addTextArea((text) => {
+                text
+                    .setValue(cmdNames.join("\n"))
+                text.inputEl.onblur = async () => {
+                    const textArray = text.getValue() ? text.getValue().trim().split("\n") : []
+                    const ids = getCommandIds(textArray)
+                    this.plugin.settings.excludeCommands = ids
+                    await this.plugin.saveSettings();
+                    this.close()
+                    this.modal.close()
+                    this.app.commands.executeCommandById("command-palette:open")
+                }
+                text.inputEl.setAttr("rows", 4)
+                text.inputEl.setAttr("cols", 40)
+            })
     }
 }

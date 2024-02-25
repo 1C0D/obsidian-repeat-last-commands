@@ -1,10 +1,12 @@
-import { Notice, Plugin } from 'obsidian';
-import { getCommandName, onCommandTrigger } from './last-command';
+import { Command, Notice, Plugin } from 'obsidian';
+import { around } from 'monkey-around';
+import { onCommandTrigger } from './palette';
 import { RLCSettingTab } from './settings';
 import { RLCSettings } from './global';
 import { DEFAULT_SETTINGS } from './variables';
 import { LastCommandsModal } from './modals';
 import { Console } from './Console';
+import { getCommandName } from './cmd-utils';
 
 export default class RepeatLastCommands extends Plugin {
 	settings: RLCSettings;
@@ -16,6 +18,17 @@ export default class RepeatLastCommands extends Plugin {
 	async onload() {
 		await this.loadSettings();
 		this.addSettingTab(new RLCSettingTab(this));
+
+		const {settings} = this
+		this.register(around(this.app.commands.constructor.prototype, {
+			listCommands(old) {
+				return function (...args: any[]) {
+					const commands: Command[] = old.call(this, ...args);
+					return commands.filter((command) => !settings.excludeCommands.includes(command.id));
+				}
+			}
+		}));
+
 		this.register(onCommandTrigger(this))
 
 		const text = this.settings.ifNoCmdOpenCmdPalette ? "No last command.\n→ command palette" : "No last command"

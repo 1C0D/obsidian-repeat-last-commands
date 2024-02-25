@@ -1,15 +1,16 @@
 import { around } from "monkey-around";
 import { Command } from "obsidian";
 import RepeatLastCommands from "./main";
-import { altEvent } from "./events";
+import { altEvent, hideCmd } from "./events";
 import { aliasify, getBackSelection, getConditions } from "./cmd-utils";
 import { Console } from "./Console";
+import { ShowAgainCmds } from "./modals";
 
 function addCPListeners(plugin: RepeatLastCommands) {//command palette
     addInfoPalette(plugin)
     addClickListener(plugin)
-    setTimeout(() => {
-        addKeyboardListener(plugin)        
+    setTimeout(() => { // delay to avoid conflict with repeat last commands shortcut (ctrl)
+        addKeyboardListener(plugin)
     }, 800);
 }
 
@@ -24,8 +25,8 @@ export function onCommandTrigger(plugin: RepeatLastCommands) {//notice we must p
     const uninstallCommand = around(this.app.commands, {
         executeCommand(originalMethod) {
             return function (...args: Command[]) {
-                if (args[0].id === "command-palette:open") { addCPListeners(plugin) }
-                else { onHKTrigger(plugin, args[0].id) }
+                if (args[0].id === "command-palette:open") addCPListeners(plugin)
+                else onHKTrigger(plugin, args[0].id)
                 const result =
                     originalMethod && originalMethod.apply(this, args);
                 return result;
@@ -62,15 +63,16 @@ function applySelectedId(id: string, plugin: RepeatLastCommands) {
 }
 
 
-export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastCommands) {
+export async function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastCommands) {
     if (e instanceof KeyboardEvent && (e.key === "ArrowDown" || e.key === "ArrowUp")) return
     const { modal, instance, pluginCommand } = getModalCmdVars(plugin)
     const { values, aliases, chooser } = getConditions(plugin)
-    if(!values) return
-    const settings = plugin.settings
+    if (!values) return
+    const { settings } = plugin
     // Console.log("aliases", aliases)
     const selectedItem = chooser.selectedItem
     // Console.log("selectedItem", selectedItem)
+    const selectedId = values[selectedItem]?.item.id
 
     // suggestion values matching aliases
     if (Object.keys(aliases).length || settings.sort) {
@@ -97,15 +99,17 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
         }, 400);
     }
 
-    if (e instanceof KeyboardEvent && e.key !== "Enter" && e.key !== "Tab" && e.key !== "Alt") return
-
-
-    if (e instanceof KeyboardEvent && e.key === "Alt") {
+    let keepOn = false
+    if (e instanceof KeyboardEvent && e.ctrlKey && e.key === "-") {
+        await hideCmd(e as KeyboardEvent, plugin, selectedItem, chooser)
+        modal.close()
+        this.app.commands.executeCommandById("command-palette:open")
+    } else if (e instanceof KeyboardEvent && e.ctrlKey && e.key === "+") {
+        new ShowAgainCmds(this.app, plugin, modal).open()
+    } else if (e instanceof KeyboardEvent && e.key === "Alt") {
         altEvent(e as KeyboardEvent, plugin, selectedItem, chooser)
-    }
-    
-    const selectedId = values[selectedItem]?.item.id
-    if (e instanceof KeyboardEvent && e.key === "Tab") {
+        keepOn = true
+    } else if (e instanceof KeyboardEvent && e.key === "Tab") {
         if (!modal.win) return
         const pinned = instance.options.pinned
         if (pinned.includes(selectedId)) {
@@ -121,9 +125,11 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
         return
     }
 
-    const rejectedIds = getRejectedCondition(plugin, selectedId)
-    if (rejectedIds) return
-    applySelectedId(selectedId, plugin)
+    if (keepOn) {
+        const rejectedIds = getRejectedCondition(plugin, selectedId)
+        if (rejectedIds) return
+        applySelectedId(selectedId, plugin)
+    }
 }
 
 
@@ -131,7 +137,7 @@ export function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastC
 function addClickListener(plugin: RepeatLastCommands) {
     const { modal } = getModalCmdVars(plugin)
     const resultContainerEl = modal.resultContainerEl
-    resultContainerEl.addEventListener("click", (e: MouseEvent) => registerCPCmd(e, plugin));
+    resultContainerEl.addEventListener("click", async (e: MouseEvent) => await registerCPCmd(e, plugin));
 }
 
 function addKeyboardListener(plugin: RepeatLastCommands) {
@@ -156,17 +162,6 @@ function getModalCmdVars(plugin: RepeatLastCommands) {
     return { modal, instance, pluginCommand }
 }
 
-export function getCommandName(id: string) {
-    for (const key in this.app.commands.commands) {
-        const command = this.app.commands.commands[key];
-        if (command.id === id) {
-            command.name.startsWith("*") ? command.name = command.name.substring(1) : null
-            return command.name;
-        }
-    }
-    return null;
-}
-
 function addInfoPalette(plugin: RepeatLastCommands) {
     const { modal } = getModalCmdVars(plugin);
     const resultContainerEl = modal.resultContainerEl;
@@ -174,7 +169,7 @@ function addInfoPalette(plugin: RepeatLastCommands) {
     if (!plugin.infoDiv) {
         plugin.infoDiv = document.createElement('div');
         plugin.infoDiv.classList.add('result-container-afterend');
-        plugin.infoDiv.textContent = "Alt: add command alias | Tab: toggle command pinning";
+        plugin.infoDiv.textContent = "Alt: command alias | Tab: command pin | Ctrl - hide command | Ctrl + show again";
         resultContainerEl.insertAdjacentElement("afterend", plugin.infoDiv);
     }
 }

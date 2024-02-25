@@ -1,4 +1,4 @@
-import { Console } from "./Console"
+// import { Console } from "./Console"
 import RepeatLastCommands from "./main"
 
 export function getConditions(plugin: RepeatLastCommands) {
@@ -31,8 +31,8 @@ export function aliasify(values: any, aliases: any) {
 
 export function getBackSelection(chooser: any, selectedItem: number) {
     for (let i = 1; i <= selectedItem; i++) {
-    try {
-        if (selectedItem)
+        try {
+            if (selectedItem)
                 chooser.moveDown(1)
         } catch (err) {
             const dd = "I don't care this error, job is done"
@@ -41,4 +41,21 @@ export function getBackSelection(chooser: any, selectedItem: number) {
 
     // if (selectedItem === 0) chooser.selectedItem = chooser.values.length - 1
     // else chooser.selectedItem = selectedItem - 1
+}
+
+export function getCommandName(id: string) {
+    const command = this.app.commands.findCommand(id);
+    command.name.startsWith("*") ? command.name = command.name.substring(1) : null
+    return command.name;
+}
+
+export function getCommandIds(names: string[]) {
+    const ids = []
+    for (const key in this.app.commands.commands) {
+        const command = this.app.commands.commands[key];
+        if (names.includes(command.name)) {
+            ids.push(command.id)
+        }
+    }
+    return ids;
 }
