@@ -1,2 +1,1 @@
-transition from repeat command(s) to palette improved if no last command(s)
-Settings presentation improved
+hide (ctrl -) show (ctrl +) some commands in command palette. see demo in readme
