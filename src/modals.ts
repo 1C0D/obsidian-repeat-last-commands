@@ -67,7 +67,7 @@ export class AliasModal extends Modal {
         this.titleEl.setText(`Define an alias`); //
         contentEl.setText(`for: "${name}"`); //
         const input = new TextComponent(contentEl)
-            .setPlaceholder('alias or nothing to delete previous alias')
+            .setPlaceholder('enter nothing to delete previous alias')
             .onChange(async (value) => {
                 this.result = value;
             })

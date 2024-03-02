@@ -71,7 +71,6 @@ export async function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: Repea
     const { settings } = plugin
     // Console.log("aliases", aliases)
     const selectedItem = chooser.selectedItem
-    // Console.log("selectedItem", selectedItem)
     const selectedId = values[selectedItem]?.item.id
 
     // suggestion values matching aliases
@@ -98,17 +97,17 @@ export async function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: Repea
             instance.saveSettings(pluginCommand)
         }, 400);
     }
-
-    let keepOn = false
     if (e instanceof KeyboardEvent && e.ctrlKey && e.key === "-") {
         await hideCmd(e as KeyboardEvent, plugin, selectedItem, chooser)
         modal.close()
         this.app.commands.executeCommandById("command-palette:open")
+        return
     } else if (e instanceof KeyboardEvent && e.ctrlKey && e.key === "+") {
         new ShowAgainCmds(this.app, plugin, modal).open()
+        return
     } else if (e instanceof KeyboardEvent && e.key === "Alt") {
         altEvent(e as KeyboardEvent, plugin, selectedItem, chooser)
-        keepOn = true
+        return
     } else if (e instanceof KeyboardEvent && e.key === "Tab") {
         if (!modal.win) return
         const pinned = instance.options.pinned
@@ -125,11 +124,9 @@ export async function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: Repea
         return
     }
 
-    if (keepOn) {
-        const rejectedIds = getRejectedCondition(plugin, selectedId)
-        if (rejectedIds) return
-        applySelectedId(selectedId, plugin)
-    }
+    const rejectedIds = getRejectedCondition(plugin, selectedId)
+    if (rejectedIds) return
+    applySelectedId(selectedId, plugin)
 }
 
 

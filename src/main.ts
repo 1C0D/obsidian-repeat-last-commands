@@ -31,7 +31,7 @@ export default class RepeatLastCommands extends Plugin {
 
 		this.register(onCommandTrigger(this))
 
-		const text = this.settings.ifNoCmdOpenCmdPalette ? "No last command.\n→ command palette" : "No last command"
+		const text = this.settings.ifNoCmdOpenCmdPalette ? "No last command.\nopening command palette..." : "No last command"
 
 		this.addCommand({
 			id: "repeat-command",
@@ -46,8 +46,11 @@ export default class RepeatLastCommands extends Plugin {
 				}
 				else {
 					new Notice(text, 2500)
-					if (this.settings.ifNoCmdOpenCmdPalette)
-					this.app.commands.executeCommandById("command-palette:open") 
+					if (this.settings.ifNoCmdOpenCmdPalette) {
+						setTimeout(() => {
+							this.app.commands.executeCommandById("command-palette:open")
+						}, 400);
+					} 
 				}
 			},
 		});
@@ -61,7 +64,10 @@ export default class RepeatLastCommands extends Plugin {
 				else {
 					new Notice(text,2500)
 					if (this.settings.ifNoCmdOpenCmdPalette)
-					this.app.commands.executeCommandById("command-palette:open") 
+					{ setTimeout(() => {
+						this.app.commands.executeCommandById("command-palette:open") 
+					}, 400);
+					}
 				}
 			},
 		});
