@@ -1,1 +1,1 @@
-hide (ctrl -) show (ctrl +) some commands in command palette. see demo in readme
+fix: last commands not found
