@@ -7,7 +7,7 @@ export const DEFAULT_SETTINGS: RLCSettings = {
     sort: true,
     userExcludedIDs: [],
     ifNoCmdOpenCmdPalette: true,
-    includeCmdPaletteOPen: true,
-    showCmdId: true,
+    includeCmdPaletteOPen: false,
+    showCmdId: false,
     excludeCommands: []
 }

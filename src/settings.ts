@@ -12,8 +12,10 @@ export class RLCSettingTab extends PluginSettingTab {
         const { containerEl: El } = this;
         El.empty();
 
+        El.createEl("h3", { text: "Repeat last command" })
+
         new Setting(El)
-            .setName("repeat last command: notify last command")
+            .setName("notify last command")
             .addToggle((toggle) => {
                 toggle
                     .setValue(this.plugin.settings.notify)
@@ -26,7 +28,7 @@ export class RLCSettingTab extends PluginSettingTab {
         El.createEl("h3", { text: "Repeat last commands" })
 
         new Setting(El)
-            .setName("repeat last commands: number max of commands to show")
+            .setName("Number max of commands to show")
             .addSlider((slider) => {
                 slider
                     .setLimits(2, 12, 1)
@@ -39,10 +41,10 @@ export class RLCSettingTab extends PluginSettingTab {
             })
 
         new Setting(El)
-            .setName("repeat last command(s): if no last command(s), then open command palette instead")
+            .setName("If no last command(s), then open command palette instead")
             .addToggle((toggle) => {
                 toggle
-                    .setValue(this.plugin.settings.notify)
+                    .setValue(this.plugin.settings.ifNoCmdOpenCmdPalette)
                     .onChange(async (value) => {
                         this.plugin.settings.ifNoCmdOpenCmdPalette = value
                         await this.plugin.saveSettings();
@@ -50,21 +52,10 @@ export class RLCSettingTab extends PluginSettingTab {
             })
 
         new Setting(El)
-            .setName('repeat last command(s): add "open command palette" as last command')
+            .setName("Show command id (2nd line)")
             .addToggle((toggle) => {
                 toggle
-                    .setValue(this.plugin.settings.notify)
-                    .onChange(async (value) => {
-                        this.plugin.settings.includeCmdPaletteOPen = value
-                        await this.plugin.saveSettings();
-                    })
-            })
-
-        new Setting(El)
-            .setName("repeat last command(s): show command id (2nd line)")
-            .addToggle((toggle) => {
-                toggle
-                    .setValue(this.plugin.settings.notify)
+                    .setValue(this.plugin.settings.showCmdId)
                     .onChange(async (value) => {
                         this.plugin.settings.showCmdId = value
                         await this.plugin.saveSettings();
@@ -72,8 +63,26 @@ export class RLCSettingTab extends PluginSettingTab {
             })
 
         new Setting(El)
-            .setName("Add last command(s) exeptions IDs (seperated by new line)")
-            .setDesc("ex: 'repeat-last-commands:repeat-command' or just 'repeat-last-commands' → all commands from this plugin. tips: use 'Copy last command id in clipbooard'to get last command id")
+            .setName('Add "open command palette" as last command')
+            .addToggle((toggle) => {
+                toggle
+                    .setValue(this.plugin.settings.includeCmdPaletteOPen)
+                    .onChange(async (value) => {
+                        this.plugin.settings.includeCmdPaletteOPen = value
+                        await this.plugin.saveSettings();
+                    })
+            })
+
+        const fragment = new DocumentFragment();
+        fragment.createDiv({}, div => {
+            div.innerHTML = `ex: 'repeat-last-commands:repeat-command'<br> 
+        or 'repeat-last-commands' → all commands from this plugin.<br>
+        Use 'Copy last command id in clipbooard', in command palette, to get last command id`
+        });
+
+        new Setting(El)
+            .setName("Add last command(s) exeptions IDs (separated by new line)")
+                .setDesc(fragment)
             .addTextArea((text) => {
                 text
                     .setValue(this.plugin.settings.userExcludedIDs.join("\n"))
@@ -87,7 +96,6 @@ export class RLCSettingTab extends PluginSettingTab {
 
         new Setting(El)
             .setName("Recently used commands at top of command palette")
-            .setDesc("depending on the number of last commands")
             .addToggle((toggle) => {
                 toggle
                     .setValue(this.plugin.settings.sort)

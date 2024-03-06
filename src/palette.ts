@@ -65,13 +65,16 @@ function applySelectedId(id: string, plugin: RepeatLastCommands) {
 
 export async function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: RepeatLastCommands) {
     if (e instanceof KeyboardEvent && (e.key === "ArrowDown" || e.key === "ArrowUp")) return
+
     const { modal, instance, pluginCommand } = getModalCmdVars(plugin)
     const { values, aliases, chooser } = getConditions(plugin)
     if (!values) return
+
     const { settings } = plugin
     // Console.log("aliases", aliases)
     const selectedItem = chooser.selectedItem
     const selectedId = values[selectedItem]?.item.id
+    const selectedName = values[selectedItem]?.item.name
 
     // suggestion values matching aliases
     if (Object.keys(aliases).length || settings.sort) {
@@ -97,36 +100,49 @@ export async function registerCPCmd(e: MouseEvent | KeyboardEvent, plugin: Repea
             instance.saveSettings(pluginCommand)
         }, 400);
     }
-    if (e instanceof KeyboardEvent && e.ctrlKey && e.key === "-") {
-        await hideCmd(e as KeyboardEvent, plugin, selectedItem, chooser)
-        modal.close()
-        this.app.commands.executeCommandById("command-palette:open")
-        return
-    } else if (e instanceof KeyboardEvent && e.ctrlKey && e.key === "+") {
-        new ShowAgainCmds(this.app, plugin, modal).open()
-        return
-    } else if (e instanceof KeyboardEvent && e.key === "Alt") {
-        altEvent(e as KeyboardEvent, plugin, selectedItem, chooser)
-        return
-    } else if (e instanceof KeyboardEvent && e.key === "Tab") {
-        if (!modal.win) return
-        const pinned = instance.options.pinned
-        if (pinned.includes(selectedId)) {
-            pinned.remove(selectedId)
-        } else {
-            instance.options.pinned.push(selectedId)
+
+    if (e instanceof KeyboardEvent) {
+        if (e.ctrlKey && e.key === "-") {
+            await hideCmd(e as KeyboardEvent, plugin, selectedItem, chooser)
+            modal.close()
+            this.app.commands.executeCommandById("command-palette:open")
+            return
+        } else if (e.ctrlKey && e.key === "+") {
+            new ShowAgainCmds(this.app, plugin, modal).open()
+            return
+        } else if (e.ctrlKey && e.key === "h") {
+            modal.close()
+            showHotkeysFor(e as KeyboardEvent, selectedName)
+            return
+        } else if (e.key === "Alt") {
+            altEvent(e as KeyboardEvent, plugin, selectedItem, chooser)
+            return
+        } else if (e.key === "Tab") {
+            // if (!modal.win) return
+            const pinned = instance.options.pinned
+            if (pinned.includes(selectedId)) {
+                pinned.remove(selectedId)
+            } else {
+                instance.options.pinned.push(selectedId)
+            }
+            instance.saveSettings(pluginCommand)
+            setTimeout(() => {
+                getBackSelection(chooser, selectedItem)
+            }, 400);
+            return
+        } else if (e.key === "Enter") {
+            const rejectedIds = getRejectedCondition(plugin, selectedId)
+            if (rejectedIds) return
+            applySelectedId(selectedId, plugin)
         }
-        instance.saveSettings(pluginCommand)
-        setTimeout(() => {
-            getBackSelection(chooser, selectedItem)
-        }, 400);
-
-        return
+        else {
+            return
+        }
+    }else{
+        const rejectedIds = getRejectedCondition(plugin, selectedId)
+        if (rejectedIds) return
+        applySelectedId(selectedId, plugin)
     }
-
-    const rejectedIds = getRejectedCondition(plugin, selectedId)
-    if (rejectedIds) return
-    applySelectedId(selectedId, plugin)
 }
 
 
@@ -166,7 +182,25 @@ function addInfoPalette(plugin: RepeatLastCommands) {
     if (!plugin.infoDiv) {
         plugin.infoDiv = document.createElement('div');
         plugin.infoDiv.classList.add('result-container-afterend');
-        plugin.infoDiv.textContent = "Alt: command alias | Tab: command pin | Ctrl - hide command | Ctrl + show again";
+        plugin.infoDiv.textContent = "Alt: alias | Tab: pin | Ctrl -: hide | Ctrl +: show | Ctrl h: hotkey";
         resultContainerEl.insertAdjacentElement("afterend", plugin.infoDiv);
     }
 }
+
+const showHotkeysFor = async function (
+    evt: KeyboardEvent,
+    selectedName: string
+) {
+    evt.preventDefault();
+    await this.app.setting.open();
+    await this.app.setting.openTabById("hotkeys");
+    const tab = await this.app.setting.activeTab;
+    tab.searchComponent.inputEl.value = selectedName;
+    tab.updateHotkeyVisibility();
+    tab.searchComponent.inputEl.blur();
+    const old = this.app.setting.onClose
+    this.app.setting.onClose = () => {
+        this.app.commands.executeCommandById("command-palette:open")
+        this.app.setting.onClose = old;
+    }
+};
